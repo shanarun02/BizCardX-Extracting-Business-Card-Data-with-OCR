@@ -1,4 +1,4 @@
-import sqlite3
+import mysql.connector
 import pandas as pd
 import streamlit as st
 from streamlit_option_menu import option_menu
@@ -11,11 +11,14 @@ import re
 from io import BytesIO
 
 reader = easyocr.Reader(['en'])
-conn = sqlite3.connect("project_three.db")
-cursor = conn.cursor()
+conn=mysql.connector.connect (host='localhost',
+                              user='root',
+                              password='Arun@5851',
+                              database='youtube')
+cursor=conn.cursor()
+
 cursor.execute('''CREATE TABLE IF NOT EXISTS business_card_datas
-                   (id INTEGER PRIMARY KEY,
-                    company_name TEXT,
+                   (company_name TEXT,
                     card_holder TEXT,
                     designation TEXT,
                     mobile_number TEXT,
@@ -185,16 +188,15 @@ if selected == "Upload":
           }
    
            updated_df = pd.DataFrame(updated_data, index=[0])
-           st.dataframe(updated_df)
            if st.button("Upload to Database"):
-                           
-               for i,row in updated_df.iterrows():
-                   # here %S means string values
-                   sql =  """INSERT INTO business_card_datas(company_name,card_holder,designation,mobile_number,email,website,area,city,state,pin_code,image)
-                                         VALUES (?,?,?,?,?,?,?,?,?,?,?)"""
+               for i, row in updated_df.iterrows():
+                   placeholders = ', '.join(['%s' for _ in range(len(row))])
+                   columns = ', '.join(updated_df.columns)
+                   sql = f"INSERT INTO business_card_datas ({columns}) VALUES ({placeholders})"
                    cursor.execute(sql, tuple(row))
                    conn.commit()
-               st.success("#### Uploaded to database successfully!")
+               st.success("Uploaded to the database successfully ")
+
    
 
 if selected == "Show":
