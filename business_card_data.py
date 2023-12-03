@@ -186,8 +186,9 @@ if selected == "Upload":
               "pin_code": pin_code,
               "image": binary_img(saved_img)  # Update this line
           }
-   
+            
            updated_df = pd.DataFrame(updated_data, index=[0])
+           st.dataframe(updated_df)
            if st.button("Upload to Database"):
                for i, row in updated_df.iterrows():
                    placeholders = ', '.join(['%s' for _ in range(len(row))])
